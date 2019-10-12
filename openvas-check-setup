@@ -54,12 +54,12 @@ then
   VER="9"
   SCANNER_MAJOR="5"
   SCANNER_MINOR="1"
-  MANAGER_MAJOR="6"
-  MANAGER_MINOR="1"
+  MANAGER_MAJOR="7"
+  MANAGER_MINOR="0"
   ADMINISTRATOR_MAJOR="0"
   ADMINISTRATOR_MINOR="0"
-  GSA_MAJOR="6"
-  GSA_MINOR="1"
+  GSA_MAJOR="7"
+  GSA_MINOR="0"
   CLI_MAJOR="1"
   CLI_MINOR="4"
 elif [ "$1" = "--v8" -o "$2" = "--v8" ]
@@ -228,7 +228,8 @@ log_and_print "OK: OpenVAS Scanner CA Certificate is present as $CAFILE."
 
 # Specific to kali
 echo "Checking OpenVAS Manager server certificate ..." >> $LOG
-CERTDIR=`dirname $CAFILE`
+#CERTDIR=`dirname $CAFILE`
+CERTDIR="/usr/local/var/lib/openvas/CA/"
 SERVERCERTFILE="$CERTDIR/servercert.pem"
 if [ ! -e $SERVERCERTFILE ]
 then
@@ -370,7 +371,8 @@ log_and_print "OK: OpenVAS Manager is present in version $VERSION."
 
 # Check modified for kali
 echo "Checking OpenVAS Manager client certificate ..." >> $LOG
-CERTDIR=`dirname $CAFILE`
+#CERTDIR=`dirname $CAFILE`
+CERTDIR="/usr/local/var/lib/openvas/CA/"
 CLIENTCERTFILE="$CERTDIR/clientcert.pem"
 if [ ! -e $CLIENTCERTFILE ]
 then
@@ -756,7 +758,7 @@ then
   case "$OPENVASSD_HOST" in
     "0.0.0.0"|"::") log_and_print "OK: OpenVAS Scanner is running and listening on all interfaces." ;;
     "127.0.0.1") log_and_print "OK: OpenVAS Scanner is running and listening only on the local interface." ;;
-    "") OPENVASSD_PROC=`ps -Af | grep "openvassd: waiting for incoming connections" | grep -v grep | wc -l`
+    "") OPENVASSD_PROC=`ps -Af | grep -i "openvassd: waiting for incoming connections" | grep -v grep | wc -l` ### Add the -i
         if [ $OPENVASSD_PROC -eq 0 ]
         then
           log_and_print "ERROR: OpenVAS Scanner is NOT running!" ;
@@ -820,7 +822,7 @@ then
                  log_and_print "This means that you will not be able to access the Greenbone Security Assistant from the"
                  log_and_print "outside using a web browser."
                  log_and_print "SUGGEST: Ensure that Greenbone Security Assistant listens on all interfaces." ;;
-    "") log_and_print "ERROR: Greenbone Security Assistant is NOT running!"
+    "") log_and_print "WARNING: Greenbone Security Assistant is NOT running!"
         log_and_print "FIX: Start Greenbone Security Assistant (gsad)."
         GSAD_PORT=-1 ;;
   esac
@@ -927,6 +929,7 @@ then
 This is a test of the PDF generation capabilities of your OpenVAS installation. Please ignore.
 \end{document}
 EOT
+
   pdflatex -interaction batchmode -output-directory $PDFTMPDIR $TEXFILE > /dev/null 2>&1
   if [ ! -f "$PDFTMPDIR/test.pdf" ]
   then
